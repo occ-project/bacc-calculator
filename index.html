@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Military BACC Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <h1>Military Basic Allowance for Child Care (BACC) Calculator</h1>
+            <p class="subtitle">Calculate your family's monthly and annual child care allowances based on military rank, location, and children's ages.</p>
+        </header>
+
+        <!-- Input Section -->
+        <section class="card input-section">
+            <div class="card__header">
+                <h2>Service Member Information</h2>
+            </div>
+            <div class="card__body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="rank" class="form-label">Military Rank *</label>
+                        <select id="rank" class="form-control" required>
+                            <option value="">Select Rank</option>
+                            <optgroup label="Enlisted">
+                                <option value="E-1">E-1 - Private/Seaman Recruit/Airman Basic</option>
+                                <option value="E-2">E-2 - Private/Seaman Apprentice/Airman</option>
+                                <option value="E-3">E-3 - Private First Class/Seaman/Airman First Class</option>
+                                <option value="E-4">E-4 - Corporal/Specialist/Petty Officer 3rd/Senior Airman</option>
+                                <option value="E-5">E-5 - Sergeant/Petty Officer 2nd/Staff Sergeant</option>
+                                <option value="E-6">E-6 - Staff Sergeant/Petty Officer 1st/Technical Sergeant</option>
+                                <option value="E-7">E-7 - Sergeant First Class/Chief Petty Officer/Master Sergeant</option>
+                                <option value="E-8">E-8 - Master Sergeant/Senior Chief/Senior Master Sergeant</option>
+                                <option value="E-9">E-9 - Sergeant Major/Master Chief/Chief Master Sergeant</option>
+                            </optgroup>
+                            <optgroup label="Warrant Officers">
+                                <option value="W-1">W-1 - Warrant Officer 1</option>
+                                <option value="W-2">W-2 - Chief Warrant Officer 2</option>
+                                <option value="W-3">W-3 - Chief Warrant Officer 3</option>
+                                <option value="W-4">W-4 - Chief Warrant Officer 4</option>
+                                <option value="W-5">W-5 - Chief Warrant Officer 5</option>
+                            </optgroup>
+                            <optgroup label="Officers">
+                                <option value="O-1">O-1 - Second Lieutenant/Ensign</option>
+                                <option value="O-2">O-2 - First Lieutenant/Lieutenant JG</option>
+                                <option value="O-3">O-3 - Captain/Lieutenant</option>
+                                <option value="O-4">O-4 - Major/Lieutenant Commander</option>
+                                <option value="O-5">O-5 - Lieutenant Colonel/Commander</option>
+                                <option value="O-6">O-6 - Colonel/Captain</option>
+                                <option value="O-7">O-7 - Brigadier General/Rear Admiral Lower</option>
+                                <option value="O-8">O-8 - Major General/Rear Admiral Upper</option>
+                                <option value="O-9">O-9 - Lieutenant General/Vice Admiral</option>
+                                <option value="O-10">O-10 - General/Admiral</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location" class="form-label">Geographic Cost Area *</label>
+                        <select id="location" class="form-control" required>
+                            <option value="">Select Location</option>
+                            <option value="Low Cost">Low Cost Area (0.8x multiplier)</option>
+                            <option value="Standard Cost">Standard Cost Area (1.0x multiplier)</option>
+                            <option value="High Cost">High Cost Area (1.5x multiplier)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="costShare" class="form-label">
+                            Cost Sharing Percentage 
+                            <span class="tooltip" title="Percentage of childcare costs you pay (typically 10%)">ⓘ</span>
+                        </label>
+                        <input type="number" id="costShare" class="form-control" value="10" min="0" max="100" step="1">
+                        <small class="form-help">Enter as percentage (e.g., 10 for 10%)</small>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" id="loadExample" class="btn btn--secondary">Load Example Scenario</button>
+                    <button type="button" id="resetForm" class="btn btn--outline">Reset Calculator</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Children Section -->
+        <section class="card children-section">
+            <div class="card__header">
+                <h2>Children Information</h2>
+                <button type="button" id="addChild" class="btn btn--primary">Add Child</button>
+            </div>
+            <div class="card__body">
+                <div id="childrenContainer" class="children-container">
+                    <p class="no-children">No children added yet. Click "Add Child" to get started.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="card results-section" id="resultsSection">
+            <div class="card__header">
+                <h2>BACC Allowance Calculation</h2>
+                <button type="button" id="printResults" class="btn btn--outline">Print Results</button>
+            </div>
+            <div class="card__body">
+                <div id="calculationResults" class="calculation-results">
+                    <p class="results-prompt">Complete the form above to see your BACC calculation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Information Section -->
+        <section class="card info-section">
+            <div class="card__header">
+                <h2>About BACC Program</h2>
+            </div>
+            <div class="card__body">
+                <div class="info-content">
+                    <h3>What is BACC?</h3>
+                    <p>The Basic Allowance for Child Care (BACC) is a military allowance designed to help offset the cost of child care for eligible service members. The allowance varies based on rank, geographic location, and the age of children.</p>
+                    
+                    <h3>Calculation Formula</h3>
+                    <p><strong>Individual Child Allowance = Base Rank Allowance × Geographic Multiplier × Age Multiplier × (1 - Cost Share)</strong></p>
+                    
+                    <h3>Key Factors</h3>
+                    <ul>
+                        <li><strong>Base Rank Allowance:</strong> Higher ranks typically receive lower base allowances</li>
+                        <li><strong>Geographic Multiplier:</strong> Adjusts for local cost of living differences</li>
+                        <li><strong>Age Multiplier:</strong> Younger children (infants/toddlers) have higher multipliers due to increased care costs</li>
+                        <li><strong>Cost Share:</strong> The percentage of childcare costs the service member pays (typically 10%)</li>
+                    </ul>
+                    
+                    <h3>Important Notes</h3>
+                    <ul>
+                        <li>BACC calculations are estimates and actual allowances may vary</li>
+                        <li>Eligibility requirements and program details may change</li>
+                        <li>Consult with your military finance office for official calculations</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example Scenarios Modal -->
+        <div id="exampleModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Example Scenarios</h3>
+                    <button type="button" id="closeModal" class="btn btn--outline btn--sm">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="scenario-grid">
+                        <div class="scenario-card" data-scenario="0">
+                            <h4>Junior Enlisted Family</h4>
+                            <p><strong>Rank:</strong> E-4 Corporal/Specialist</p>
+                            <p><strong>Location:</strong> High Cost Area</p>
+                            <p><strong>Children:</strong> Preschooler, School-age</p>
+                        </div>
+                        <div class="scenario-card" data-scenario="1">
+                            <h4>Mid-Career NCO</h4>
+                            <p><strong>Rank:</strong> E-6 Staff Sergeant</p>
+                            <p><strong>Location:</strong> Standard Cost Area</p>
+                            <p><strong>Children:</strong> Infant</p>
+                        </div>
+                        <div class="scenario-card" data-scenario="2">
+                            <h4>Officer with Multiple Children</h4>
+                            <p><strong>Rank:</strong> O-3 Captain/Lieutenant</p>
+                            <p><strong>Location:</strong> High Cost Area</p>
+                            <p><strong>Children:</strong> Toddler, Preschooler, School-age</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
