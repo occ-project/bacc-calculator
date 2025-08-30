@@ -371,41 +371,10 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
   }
 
   // Calculations
-  function calculateChildAllowance(rank, location, age, costShare) {
+ function calculateChildAllowance(rank, location, age, costShare) {
   // No longer used—calculation logic handled by backend API
   return { amount: 0, breakdown: null };
 }
-
-
-      const baseAllowance = BACC_DATA.rankAllowances[rank];
-      const geoMultiplier = BACC_DATA.geographicMultipliers[location];
-      const ageMultiplier = BACC_DATA.ageMultipliers[age];
-      const costShareDecimal = costShare / 100;
-
-      if (!baseAllowance || geoMultiplier === undefined || !ageMultiplier) {
-        console.warn('Invalid calculation parameters:', { rank, location, age, baseAllowance, geoMultiplier, ageMultiplier });
-        return { amount: 0, breakdown: null };
-      }
-
-      const beforeCostShare = baseAllowance * geoMultiplier * ageMultiplier;
-      const finalAmount = beforeCostShare * (1 - costShareDecimal);
-
-      return {
-        amount: Math.round(finalAmount * 100) / 100,
-        breakdown: {
-          baseAllowance,
-          geoMultiplier,
-          ageMultiplier,
-          costShareDecimal,
-          beforeCostShare: Math.round(beforeCostShare * 100) / 100
-        }
-      };
-      
-    } catch (error) {
-      console.error('Error calculating child allowance:', error);
-      return { amount: 0, breakdown: null };
-    }
-  }
 
   async function updateCalculation() {
   try {
