@@ -408,34 +408,6 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
   }
 }
 
-
-      updateChildrenArray();
-
-      let totalMonthly = 0;
-      let hasValidChildren = false;
-
-      // Update individual child calculations
-      state.children.forEach(child => {
-        const calculation = calculateChildAllowance(rank, location, child.age, costShare);
-
-        const amountElement = document.getElementById(`${child.id}-amount`);
-        const detailsElement = document.getElementById(`${child.id}-details`);
-
-        if (amountElement && detailsElement) {
-          if (calculation.amount > 0) {
-            amountElement.textContent = `$${calculation.amount.toFixed(2)}`;
-            detailsElement.textContent = `Monthly allowance`;
-            totalMonthly += calculation.amount;
-            hasValidChildren = true;
-          } else {
-            amountElement.textContent = '$0.00';
-            detailsElement.textContent = child.age ? 'Complete form above' : 'Select age to calculate';
-          }
-        }
-      });
-
-      console.log('Total monthly calculated:', totalMonthly);
-
       // Update results section
       updateResultsSection(rank, location, costShare, totalMonthly, hasValidChildren);
       
