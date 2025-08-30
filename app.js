@@ -375,9 +375,6 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
     const costShare = elements.costShareInput ? (parseFloat(elements.costShareInput.value) || 10) : 10;
     updateChildrenArray();
 
-    // Fetch calculation from API
-    const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
-
     // Update results section using API result
     if (result && result.perChild) {
       result.perChild.forEach((childResult, i) => {
