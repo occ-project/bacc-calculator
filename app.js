@@ -377,7 +377,7 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
        // Fetch calculation from API
 const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.children);
     if (apiResult && apiResult.perChild) {
-      apiapiapiapiapiResult.perChild.forEach((childResult, i) => {
+      apiResult.perChild.forEach((childResult, i) => {
         const child = state.children[i];
         const amountElement = document.getElementById(`${child.id}-amount`);
         const detailsElement = document.getElementById(`${child.id}-details`);
