@@ -76,17 +76,17 @@
         costShareInput: document.getElementById('costShare'),
         addChildBtn: document.getElementById('addChild'),
         childrenContainer: document.getElementById('childrenContainer'),
-        resultsSection: document.getElementById('resultsSection'),
-        calculationResults: document.getElementById('calculationResults'),
+        apiResultsSection: document.getElementById('apiResultsSection'),
+        calculationapiResults: document.getElementById('calculationapiResults'),
         loadExampleBtn: document.getElementById('loadExample'),
         resetFormBtn: document.getElementById('resetForm'),
-        printResultsBtn: document.getElementById('printResults'),
+        printapiResultsBtn: document.getElementById('printapiResults'),
         exampleModal: document.getElementById('exampleModal'),
         closeModalBtn: document.getElementById('closeModal')
       };
 
       // Check if all critical elements exist
-      const criticalElements = ['rankSelect', 'locationSelect', 'costShareInput', 'addChildBtn', 'childrenContainer', 'calculationResults'];
+      const criticalElements = ['rankSelect', 'locationSelect', 'costShareInput', 'addChildBtn', 'childrenContainer', 'calculationapiResults'];
       let missingElements = [];
       
       for (const elementName of criticalElements) {
@@ -176,14 +176,14 @@
         console.log('Reset form button listener added');
       }
 
-      if (elements.printResultsBtn) {
-        elements.printResultsBtn.addEventListener('click', function(event) {
+      if (elements.printapiResultsBtn) {
+        elements.printapiResultsBtn.addEventListener('click', function(event) {
           event.preventDefault();
           event.stopPropagation();
-          console.log('Print results button clicked');
+          console.log('Print apiResults button clicked');
           window.print();
         });
-        console.log('Print results button listener added');
+        console.log('Print apiResults button listener added');
       }
 
       if (elements.closeModalBtn) {
@@ -377,56 +377,56 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
        // Fetch calculation from API
 const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.children);
     if (apiResult && apiResult.perChild) {
-      apiResult.perChild.forEach((childResult, i) => {
+      apiResult.perChild.forEach((childapiResult, i) => {
         const child = state.children[i];
         const amountElement = document.getElementById(`${child.id}-amount`);
         const detailsElement = document.getElementById(`${child.id}-details`);
         if (amountElement && detailsElement) {
-          amountElement.textContent = `$${childResult.amount.toFixed(2)}`;
+          amountElement.textContent = `$${childapiResult.amount.toFixed(2)}`;
           detailsElement.textContent = "Monthly allowance";
         }
       });
-      updateResultsSection(apiResult, rank, location, costShare, state.children);
+      updateapiResultsSection(apiResult, rank, location, costShare, state.children);
     } else {
-      updateResultsSection(null, rank, location, costShare, state.children);
+      updateapiResultsSection(null, rank, location, costShare, state.children);
     }
   } catch (error) {
     console.error('Error updating calculation:', error);
   }
 }
 
- function updateResultsSection(apiResult, rank, location, costShare, children) {
+ function updateapiResultsSection(apiResult, rank, location, costShare, children) {
   try {
-    if (!elements.calculationResults) {
-      console.warn('Results element not found');
+    if (!elements.calculationapiResults) {
+      console.warn('apiResults element not found');
       return;
     }
     if (!apiResult || !rank || !location || children.length === 0 || !apiResult.totalMonthly) {
-      elements.calculationResults.innerHTML = '<p class="results-prompt">Complete the form above to see your BACC calculation.</p>';
+      elements.calculationapiResults.innerHTML = '<p class="apiResults-prompt">Complete the form above to see your BACC calculation.</p>';
       return;
     }
-    let resultsHTML = `
+    let apiResultsHTML = `
       <div class="total-allowance">
         <h3 class="total-monthly">$${apiResult.totalMonthly.toFixed(2)}</h3>
         <p class="total-annual">Monthly Total • $${apiResult.totalAnnual.toFixed(2)} Annual</p>
       </div>
       <div class="calculation-breakdown">
     `;
-    apiResult.perChild.forEach((childResult, i) => {
-      resultsHTML += `
+    apiResult.perChild.forEach((childapiResult, i) => {
+      apiResultsHTML += `
         <div class="child-calculation">
-          <h4>Child ${i+1} - ${childResult.age}</h4>
+          <h4>Child ${i+1} - ${childapiResult.age}</h4>
           <div class="final-amount">
-            <p class="amount">$${childResult.amount.toFixed(2)} / month</p>
+            <p class="amount">$${childapiResult.amount.toFixed(2)} / month</p>
           </div>
         </div>
       `;
     });
-    resultsHTML += '</div>';
-    elements.calculationResults.innerHTML = resultsHTML;
-    console.log('Results section updated');
+    apiResultsHTML += '</div>';
+    elements.calculationapiResults.innerHTML = apiResultsHTML;
+    console.log('apiResults section updated');
   } catch (error) {
-    console.error('Error updating results section:', error);
+    console.error('Error updating apiResults section:', error);
   }
 }
 
@@ -546,9 +546,9 @@ const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.childr
         updateCalculation();
         hideExampleModal();
 
-        // Scroll to results
-        if (elements.resultsSection) {
-          elements.resultsSection.scrollIntoView({ behavior: 'smooth' });
+        // Scroll to apiResults
+        if (elements.apiResultsSection) {
+          elements.apiResultsSection.scrollIntoView({ behavior: 'smooth' });
         }
       }, 100);
 
@@ -577,9 +577,9 @@ const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.childr
         elements.childrenContainer.innerHTML = '<p class="no-children">No children added yet. Click "Add Child" to get started.</p>';
       }
 
-      // Reset results
-      if (elements.calculationResults) {
-        elements.calculationResults.innerHTML = '<p class="results-prompt">Complete the form above to see your BACC calculation.</p>';
+      // Reset apiResults
+      if (elements.calculationapiResults) {
+        elements.calculationapiResults.innerHTML = '<p class="apiResults-prompt">Complete the form above to see your BACC calculation.</p>';
       }
 
       console.log('Form reset complete');
