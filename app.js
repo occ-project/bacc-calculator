@@ -475,46 +475,41 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
     }
   }
 
-  function updateResultsSection(rank, location, costShare, totalMonthly, hasValidChildren) {
-    try {
-      if (!elements.calculationResults) {
-        console.warn('Results element not found');
-        return;
-      }
-
-      if (!rank || !location || state.children.length === 0 || !hasValidChildren) {
-        elements.calculationResults.innerHTML = '<p class="results-prompt">Complete the form above to see your BACC calculation.</p>';
-        return;
-      }
-
-      const totalAnnual = totalMonthly * 12;
-
-      let resultsHTML = `
-        <div class="total-allowance">
-          <h3 class="total-monthly">$${totalMonthly.toFixed(2)}</h3>
-          <p class="total-annual">Monthly Total • $${totalAnnual.toFixed(2)} Annual</p>
-        </div>
-        <div class="calculation-breakdown">
-      `;
-
-      state.children.forEach((child, index) => {
-        if (child.age) {
-          const calculation = calculateChildAllowance(rank, location, child.age, costShare);
-          if (calculation.breakdown) {
-            resultsHTML += createChildCalculationHTML(index + 1, child.age, calculation);
-          }
-        }
-      });
-
-      resultsHTML += '</div>';
-      elements.calculationResults.innerHTML = resultsHTML;
-      
-      console.log('Results section updated');
-      
-    } catch (error) {
-      console.error('Error updating results section:', error);
+ function updateResultsSection(result, rank, location, costShare, children) {
+  try {
+    if (!elements.calculationResults) {
+      console.warn('Results element not found');
+      return;
     }
+    if (!result || !rank || !location || children.length === 0 || !result.totalMonthly) {
+      elements.calculationResults.innerHTML = '<p class="results-prompt">Complete the form above to see your BACC calculation.</p>';
+      return;
+    }
+    let resultsHTML = `
+      <div class="total-allowance">
+        <h3 class="total-monthly">$${result.totalMonthly.toFixed(2)}</h3>
+        <p class="total-annual">Monthly Total • $${result.totalAnnual.toFixed(2)} Annual</p>
+      </div>
+      <div class="calculation-breakdown">
+    `;
+    result.perChild.forEach((childResult, i) => {
+      resultsHTML += `
+        <div class="child-calculation">
+          <h4>Child ${i+1} - ${childResult.age}</h4>
+          <div class="final-amount">
+            <p class="amount">$${childResult.amount.toFixed(2)} / month</p>
+          </div>
+        </div>
+      `;
+    });
+    resultsHTML += '</div>';
+    elements.calculationResults.innerHTML = resultsHTML;
+    console.log('Results section updated');
+  } catch (error) {
+    console.error('Error updating results section:', error);
   }
+}
+
 
   function createChildCalculationHTML(childNumber, age, calculation) {
     const { amount, breakdown } = calculation;
