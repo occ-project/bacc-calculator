@@ -345,6 +345,20 @@ function addChild() {
       console.error('Error updating children array:', error);
     }
   }
+// API call: fetch calculation from backend
+async function fetchBACCFromAPI(rank, location, costShare, children) {
+  try {
+    const response = await fetch('http://localhost:5050/api/calculate-bacc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rank, location, costShare, children })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('API error:', error);
+    return null;
+  }
+}
 
   // Calculations
  function calculateChildAllowance(rank, location, age, costShare) {
@@ -359,7 +373,6 @@ function addChild() {
     const location = elements.locationSelect ? elements.locationSelect.value : '';
     const costShare = elements.costShareInput ? (parseFloat(elements.costShareInput.value) || 10) : 10;
     updateChildrenArray();
-const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
 
        // Fetch calculation from API
 const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
