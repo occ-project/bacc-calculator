@@ -408,14 +408,6 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
   }
 }
 
-      // Update results section
-      updateResultsSection(rank, location, costShare, totalMonthly, hasValidChildren);
-      
-    } catch (error) {
-      console.error('Error updating calculation:', error);
-    }
-  }
-
  function updateResultsSection(result, rank, location, costShare, children) {
   try {
     if (!elements.calculationResults) {
