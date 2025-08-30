@@ -375,9 +375,9 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
     updateChildrenArray();
 
        // Fetch calculation from API
-const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
-    if (result && result.perChild) {
-      result.perChild.forEach((childResult, i) => {
+const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.children);
+    if (apiResult && apiResult.perChild) {
+      apiapiapiapiapiResult.perChild.forEach((childResult, i) => {
         const child = state.children[i];
         const amountElement = document.getElementById(`${child.id}-amount`);
         const detailsElement = document.getElementById(`${child.id}-details`);
@@ -386,7 +386,7 @@ const result = await fetchBACCFromAPI(rank, location, costShare, state.children)
           detailsElement.textContent = "Monthly allowance";
         }
       });
-      updateResultsSection(result, rank, location, costShare, state.children);
+      updateResultsSection(apiResult, rank, location, costShare, state.children);
     } else {
       updateResultsSection(null, rank, location, costShare, state.children);
     }
@@ -395,7 +395,7 @@ const result = await fetchBACCFromAPI(rank, location, costShare, state.children)
   }
 }
 
- function updateResultsSection(result, rank, location, costShare, children) {
+ function updateResultsSection(apiResult, rank, location, costShare, children) {
   try {
     if (!elements.calculationResults) {
       console.warn('Results element not found');
@@ -412,7 +412,7 @@ const result = await fetchBACCFromAPI(rank, location, costShare, state.children)
       </div>
       <div class="calculation-breakdown">
     `;
-    result.perChild.forEach((childResult, i) => {
+    apiapiapiapiapiResult.perChild.forEach((childResult, i) => {
       resultsHTML += `
         <div class="child-calculation">
           <h4>Child ${i+1} - ${childResult.age}</h4>
