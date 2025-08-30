@@ -401,18 +401,18 @@ const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.childr
       console.warn('Results element not found');
       return;
     }
-    if (!result || !rank || !location || children.length === 0 || !result.totalMonthly) {
+    if (!apiResult || !rank || !location || children.length === 0 || !apiResult.totalMonthly) {
       elements.calculationResults.innerHTML = '<p class="results-prompt">Complete the form above to see your BACC calculation.</p>';
       return;
     }
     let resultsHTML = `
       <div class="total-allowance">
-        <h3 class="total-monthly">$${result.totalMonthly.toFixed(2)}</h3>
-        <p class="total-annual">Monthly Total • $${result.totalAnnual.toFixed(2)} Annual</p>
+        <h3 class="total-monthly">$${apiResult.totalMonthly.toFixed(2)}</h3>
+        <p class="total-annual">Monthly Total • $${apiResult.totalAnnual.toFixed(2)} Annual</p>
       </div>
       <div class="calculation-breakdown">
     `;
-    apiapiapiapiapiResult.perChild.forEach((childResult, i) => {
+    apiResult.perChild.forEach((childResult, i) => {
       resultsHTML += `
         <div class="child-calculation">
           <h4>Child ${i+1} - ${childResult.age}</h4>
@@ -429,7 +429,6 @@ const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.childr
     console.error('Error updating results section:', error);
   }
 }
-
 
   function createChildCalculationHTML(childNumber, age, calculation) {
     const { amount, breakdown } = calculation;
