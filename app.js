@@ -301,6 +301,21 @@
       }
 
       updateChildrenArray();
+      // API call: fetch calculation from backend
+async function fetchBACCFromAPI(rank, location, costShare, children) {
+  try {
+    const response = await fetch('http://localhost:5050/api/calculate-bacc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rank, location, costShare, children })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('API error:', error);
+    return null;
+  }
+}
+
       updateCalculation();
       
       console.log('Child added successfully:', childId);
@@ -357,10 +372,10 @@
 
   // Calculations
   function calculateChildAllowance(rank, location, age, costShare) {
-    try {
-      if (!rank || !location || !age) {
-        return { amount: 0, breakdown: null };
-      }
+  // No longer used—calculation logic handled by backend API
+  return { amount: 0, breakdown: null };
+}
+
 
       const baseAllowance = BACC_DATA.rankAllowances[rank];
       const geoMultiplier = BACC_DATA.geographicMultipliers[location];
@@ -392,15 +407,38 @@
     }
   }
 
-  function updateCalculation() {
-    try {
-      console.log('Updating calculation...');
+  async function updateCalculation() {
+  try {
+    console.log('Updating calculation...');
+    const rank = elements.rankSelect ? elements.rankSelect.value : '';
+    const location = elements.locationSelect ? elements.locationSelect.value : '';
+    const costShare = elements.costShareInput ? (parseFloat(elements.costShareInput.value) || 10) : 10;
+    updateChildrenArray();
 
-      const rank = elements.rankSelect ? elements.rankSelect.value : '';
-      const location = elements.locationSelect ? elements.locationSelect.value : '';
-      const costShare = elements.costShareInput ? (parseFloat(elements.costShareInput.value) || 10) : 10;
+    // Fetch calculation from API
+    const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
 
-      console.log('Current form values:', { rank, location, costShare });
+    // Update results section using API result
+    if (result && result.perChild) {
+      result.perChild.forEach((childResult, i) => {
+        const child = state.children[i];
+        const amountElement = document.getElementById(`${child.id}-amount`);
+        const detailsElement = document.getElementById(`${child.id}-details`);
+        if (amountElement && detailsElement) {
+          amountElement.textContent = `$${childResult.amount.toFixed(2)}`;
+          detailsElement.textContent = "Monthly allowance";
+        }
+      });
+      updateResultsSection(result, rank, location, costShare, state.children);
+    } else {
+      // Show empty if not complete
+      updateResultsSection(null, rank, location, costShare, state.children);
+    }
+  } catch (error) {
+    console.error('Error updating calculation:', error);
+  }
+}
+
 
       updateChildrenArray();
 
