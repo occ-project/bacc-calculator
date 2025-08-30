@@ -238,70 +238,70 @@
     }
   }
 
-  // Child Management
-  function addChild() {
-    try {
-      console.log('Adding child...');
-      
-      state.childrenCount++;
-      const childId = `child-${state.childrenCount}`;
-      
-      const childHTML = `
-        <div class="child-card" id="${childId}">
-          <div class="child-header">
-            <h4>Child ${state.childrenCount}</h4>
-            <button type="button" class="btn btn--remove btn--sm" data-child-id="${childId}">Remove</button>
+// Child Management
+function addChild() {
+  try {
+    console.log('Adding child...');
+
+    state.childrenCount++;
+    const childId = `child-${state.childrenCount}`;
+
+    const childHTML = `
+      <div class="child-card" id="${childId}">
+        <div class="child-header">
+          <h4>Child ${state.childrenCount}</h4>
+          <button type="button" class="btn btn--remove btn--sm" data-child-id="${childId}">Remove</button>
+        </div>
+        <div class="child-body">
+          <div class="form-group">
+            <label for="${childId}-age" class="form-label">Age Category *</label>
+            <select id="${childId}-age" class="form-control child-age" required>
+              <option value="">Select Age Category</option>
+              <option value="Infant (0-12 months)">Infant (0-12 months)</option>
+              <option value="Toddler (13-24 months)">Toddler (13-24 months)</option>
+              <option value="Preschool (25-60 months)">Preschool (25-60 months)</option>
+              <option value="School-age (6-13 years)">School-age (6-13 years)</option>
+            </select>
           </div>
-          <div class="child-body">
-            <div class="form-group">
-              <label for="${childId}-age" class="form-label">Age Category *</label>
-              <select id="${childId}-age" class="form-control child-age" required>
-                <option value="">Select Age Category</option>
-                <option value="Infant (0-12 months)">Infant (0-12 months)</option>
-                <option value="Toddler (13-24 months)">Toddler (13-24 months)</option>
-                <option value="Preschool (25-60 months)">Preschool (25-60 months)</option>
-                <option value="School-age (6-13 years)">School-age (6-13 years)</option>
-              </select>
-            </div>
-            <div class="child-allowance">
-              <p class="allowance-amount" id="${childId}-amount">$0.00</p>
-              <p class="allowance-details" id="${childId}-details">Select age to calculate</p>
-            </div>
+          <div class="child-allowance">
+            <p class="allowance-amount" id="${childId}-amount">$0.00</p>
+            <p class="allowance-details" id="${childId}-details">Select age to calculate</p>
           </div>
         </div>
-      `;
+      </div>
+    `;
+    // Remove "no children" message
+    const noChildrenMsg = elements.childrenContainer.querySelector('.no-children');
+    if (noChildrenMsg) {
+      noChildrenMsg.remove();
+    }
+    // Add new child
+    elements.childrenContainer.insertAdjacentHTML('beforeend', childHTML);
+    // Add event listeners for new child
+    const newAgeSelect = document.getElementById(`${childId}-age`);
+    if (newAgeSelect) {
+      newAgeSelect.addEventListener('change', function(event) {
+        console.log('Child age changed to:', event.target.value);
+        updateCalculation();
+      });
+    }
+    const newRemoveBtn = elements.childrenContainer.querySelector(`[data-child-id="${childId}"]`);
+    if (newRemoveBtn) {
+      newRemoveBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const childId = this.dataset.childId;
+        console.log('Remove child clicked for:', childId);
+        removeChild(childId);
+      });
+    }
+    updateChildrenArray();
+  } catch (error) {
+    console.error('Error adding child:', error);
+  }
+}
 
-      // Remove "no children" message
-      const noChildrenMsg = elements.childrenContainer.querySelector('.no-children');
-      if (noChildrenMsg) {
-        noChildrenMsg.remove();
-      }
-
-      // Add new child
-      elements.childrenContainer.insertAdjacentHTML('beforeend', childHTML);
-
-      // Add event listeners for new child
-      const newAgeSelect = document.getElementById(`${childId}-age`);
-      if (newAgeSelect) {
-        newAgeSelect.addEventListener('change', function(event) {
-          console.log('Child age changed to:', event.target.value);
-          updateCalculation();
-        });
-      }
-
-      const newRemoveBtn = elements.childrenContainer.querySelector(`[data-child-id="${childId}"]`);
-      if (newRemoveBtn) {
-        newRemoveBtn.addEventListener('click', function(event) {
-          event.preventDefault();
-          event.stopPropagation();
-          const childId = this.dataset.childId;
-          console.log('Remove child clicked for:', childId);
-          removeChild(childId);
-        });
-      }
-
-      updateChildrenArray();
-      // API call: fetch calculation from backend
+// API call: fetch calculation from backend
 async function fetchBACCFromAPI(rank, location, costShare, children) {
   try {
     const response = await fetch('http://localhost:5050/api/calculate-bacc', {
@@ -315,15 +315,6 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
     return null;
   }
 }
-
-      updateCalculation();
-      
-      console.log('Child added successfully:', childId);
-      
-    } catch (error) {
-      console.error('Error adding child:', error);
-    }
-  }
 
   function removeChild(childId) {
     try {
