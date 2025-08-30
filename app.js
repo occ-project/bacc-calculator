@@ -301,21 +301,6 @@ function addChild() {
   }
 }
 
-// API call: fetch calculation from backend
-async function fetchBACCFromAPI(rank, location, costShare, children) {
-  try {
-    const response = await fetch('http://localhost:5050/api/calculate-bacc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rank, location, costShare, children })
-    });
-    return await response.json();
-  } catch (error) {
-    console.error('API error:', error);
-    return null;
-  }
-}
-
   function removeChild(childId) {
     try {
       console.log('Removing child:', childId);
@@ -375,7 +360,8 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
     const costShare = elements.costShareInput ? (parseFloat(elements.costShareInput.value) || 10) : 10;
     updateChildrenArray();
 
-    // Update results section using API result
+       // Fetch calculation from API
+const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
     if (result && result.perChild) {
       result.perChild.forEach((childResult, i) => {
         const child = state.children[i];
@@ -388,7 +374,6 @@ async function fetchBACCFromAPI(rank, location, costShare, children) {
       });
       updateResultsSection(result, rank, location, costShare, state.children);
     } else {
-      // Show empty if not complete
       updateResultsSection(null, rank, location, costShare, state.children);
     }
   } catch (error) {
