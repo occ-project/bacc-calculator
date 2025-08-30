@@ -359,6 +359,7 @@ function addChild() {
     const location = elements.locationSelect ? elements.locationSelect.value : '';
     const costShare = elements.costShareInput ? (parseFloat(elements.costShareInput.value) || 10) : 10;
     updateChildrenArray();
+const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
 
        // Fetch calculation from API
 const result = await fetchBACCFromAPI(rank, location, costShare, state.children);
