@@ -1561,3 +1561,34 @@ select.form-control:focus {
     margin: 0;
   }
 }
+.important-notes {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.important-notes h3 {
+  color: #856404;
+  margin-bottom: 1rem;
+}
+
+.important-notes p {
+  margin: 0;
+  color: #856404;
+}
+
+.research-disclaimer {
+  background: #e7f3ff;
+  border: 1px solid #bee5eb;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.research-disclaimer p {
+  margin: 0;
+  color: #0c5460;
+}
