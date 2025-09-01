@@ -598,7 +598,7 @@
     }
   }
 
-  // Survey System - INSERT THE COMPLETE SURVEY SYSTEM CODE HERE
+  // Survey System
   const surveySystem = {
     currentPage: 0,
     totalPages: 0,
@@ -937,4 +937,149 @@
             html += `
               <li>
                 <label>
-                  <input type="text
+                  <input type="text" name="${question.id}_other" placeholder="Other (please specify):" value="${otherValue}" style="margin-left: 1.5rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                </label>
+              </li>
+            `;
+          }
+          html += `</ul>`;
+        }
+
+        if (question.followUp) {
+          const followUpValue = this.responses[`${question.id}_followup`] || '';
+          html += `
+            <textarea 
+              class="survey-textarea" 
+              name="${question.id}_followup" 
+              placeholder="${question.followUpText || 'Please explain your answer:'}"
+            >${followUpValue}</textarea>
+          `;
+        }
+      }
+
+      html += `</div>`;
+      content.innerHTML = html;
+
+      // Add event listeners for form elements
+      this.bindQuestionEvents(question);
+    },
+
+    bindQuestionEvents(question) {
+      const inputs = document.querySelectorAll(`input[name="${question.id}"], textarea[name="${question.id}_followup"], input[name="${question.id}_other"]`);
+      
+      inputs.forEach(input => {
+        input.addEventListener('change', () => {
+          this.saveResponse(question, input);
+        });
+      });
+    },
+
+    saveResponse(question, input) {
+      if (question.type === 'radio') {
+        if (input.checked) {
+          this.responses[question.id] = input.value;
+        }
+      } else if (question.type === 'checkbox') {
+        if (!this.responses[question.id]) {
+          this.responses[question.id] = [];
+        }
+        
+        if (input.checked && !this.responses[question.id].includes(input.value)) {
+          this.responses[question.id].push(input.value);
+        } else if (!input.checked) {
+          this.responses[question.id] = this.responses[question.id].filter(v => v !== input.value);
+        }
+      }
+      
+      // Save follow-up responses
+      if (input.name.includes('_followup')) {
+        this.responses[input.name] = input.value;
+      }
+      
+      if (input.name.includes('_other')) {
+        this.responses[input.name] = input.value;
+      }
+    },
+
+    updateButtons() {
+      const availableQuestions = this.getAvailableQuestions();
+      const backButton = document.getElementById('surveyBack');
+      const nextButton = document.getElementById('surveyNext');
+      const skipButton = document.getElementById('surveySkip');
+
+      if (backButton) {
+        backButton.style.display = this.currentPage === 0 ? 'none' : 'inline-block';
+      }
+
+      if (nextButton) {
+        if (this.currentPage === availableQuestions.length - 1) {
+          nextButton.textContent = 'Finish';
+        } else {
+          nextButton.textContent = 'Next';
+        }
+      }
+
+      if (skipButton) {
+        skipButton.style.display = this.currentPage === availableQuestions.length - 1 ? 'none' : 'inline-block';
+      }
+    },
+
+    nextPage() {
+      const availableQuestions = this.getAvailableQuestions();
+      
+      if (this.currentPage === availableQuestions.length - 1) {
+        this.submitSurvey();
+        return;
+      }
+
+      this.currentPage++;
+      this.recalculatePages();
+      this.renderCurrentPage();
+    },
+
+    previousPage() {
+      if (this.currentPage > 0) {
+        this.currentPage--;
+        this.renderCurrentPage();
+      }
+    },
+
+    recalculatePages() {
+      // Recalculate available pages in case conditional logic changed
+      const availableQuestions = this.getAvailableQuestions();
+      if (this.currentPage >= availableQuestions.length) {
+        this.currentPage = availableQuestions.length - 1;
+      }
+    },
+
+    async submitSurvey() {
+      try {
+        const response = await fetch('http://localhost:5050/api/submit-survey', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            timestamp: new Date().toISOString(),
+            responses: this.responses
+          })
+        });
+
+        if (response.ok) {
+          console.log('Survey submitted successfully');
+        } else {
+          console.error('Error submitting survey');
+        }
+      } catch (error) {
+        console.error('Error submitting survey:', error);
+      }
+
+      this.closeSurvey();
+    }
+  };
+  
+  // Start the application
+  console.log('Starting BACC Calculator application');
+  init();
+})();
+
