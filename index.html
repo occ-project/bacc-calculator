@@ -6,6 +6,37 @@
     <title>Military BACC Calculator</title>
     <link rel="stylesheet" href="style.css">
 </head>
+    <!-- Survey Modal (hidden initially) -->
+<div id="surveyModal" class="survey-modal hidden">
+  <div class="survey-container">
+    <div class="survey-header">
+      <h2>Help Shape Military Family Support</h2>
+      <div class="survey-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="progress-text" id="progressText">Question 1 of 5</span>
+      </div>
+    </div>
+    <div class="survey-content" id="surveyContent">
+      <!-- Questions will be dynamically inserted here -->
+    </div>
+    <div class="survey-buttons">
+      <button id="surveyBack" class="btn btn--secondary btn--sm">Back</button>
+      <button id="surveyNext" class="btn btn--primary">Next</button>
+      <button id="surveySkip" class="btn btn--ghost btn--sm">Skip Survey</button>
+    </div>
+  </div>
+</div>
+<!-- Trigger Button for Survey -->
+<div class="survey-trigger-section">
+  <div class="survey-cta">
+    <h3>Your Voice Matters</h3>
+    <p>Help us improve military family support programs. Your feedback is anonymous and vital.</p>
+    <button id="startSurvey" class="btn btn--primary">Take 2-Minute Survey</button>
+  </div>
+</div>
+
 <body>
     <div class="container">
         <!-- Header Section -->
