@@ -144,7 +144,33 @@
         });
         console.log('Cost share input listener added');
       }
-      
+      // Initialize unified data structure 
+function initializeDataCollection() {
+    const sessionData = {
+        sessionId: generateSessionId(),
+        timestamp: new Date().toISOString(),
+        calculatorData: {},
+        surveyData: {},
+        metadata: { userAgent: navigator.userAgent }
+    };
+    localStorage.setItem('researchData', JSON.stringify(sessionData));
+    return sessionData;
+}
+      // ADD THIS NEW FUNCTION for survey data
+function captureSurveyData(questionId, response, questionText) {
+    let data = JSON.parse(localStorage.getItem('researchData')) || initializeDataCollection();
+    data.surveyData[questionId] = {
+        response: response,
+        questionText: questionText,
+        timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('researchData', JSON.stringify(data));
+}
+
+// Generate unique session ID (NEW FUNCTION)  
+function generateSessionId() {
+    return 'calc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
       // Button listeners
       if (elements.addChildBtn) {
         elements.addChildBtn.addEventListener('click', function(event) {
