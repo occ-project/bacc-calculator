@@ -693,21 +693,7 @@
         ],
         required: true
       },
-      {
-  id: 'geographicCostArea',
-  type: 'radio',
-  title: 'What is your current geographic cost area for military housing?',
-  description: 'This affects your Basic Allowance for Housing (BAH) and would similarly affect BACC calculations.',
-  options: [
-    'High Cost Area',
-    'Standard Cost Area', 
-    'Low Cost Area',
-    'I\'m not sure - I need to check my installation'
-  ],
-  followUp: true,
-  followUpText: 'If you selected "I\'m not sure," you can find your installation\'s cost area at: https://www.occproject.org/calculators',
-  required: true
-},
+
       {
         id: 'spouseImpact',
         type: 'radio',
