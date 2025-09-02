@@ -1,6 +1,7 @@
 // BACC Calculator Application
 (function() {
   'use strict';
+  
   // Application Data
   const BACC_DATA = {
     rankAllowances: {
@@ -42,19 +43,114 @@
       }
     ]
   };
-  
+
   // Application State
   let state = {
     childrenCount: 0,
     children: []
   };
-  
+
   // DOM Elements
   let elements = {};
-  
+
+  // UNIFIED DATA COLLECTION SYSTEM
+  function generateSessionId() {
+    return 'calc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  function initializeDataCollection() {
+    const sessionData = {
+      sessionId: generateSessionId(),
+      timestamp: new Date().toISOString(),
+      calculatorData: {},
+      surveyData: {},
+      metadata: { 
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      }
+    };
+    localStorage.setItem('researchData', JSON.stringify(sessionData));
+    return sessionData;
+  }
+
+  function captureCalculatorData(fieldName, inputValue, result = null) {
+    let data = JSON.parse(localStorage.getItem('researchData')) || initializeDataCollection();
+    data.calculatorData[fieldName] = {
+      input: inputValue,
+      result: result,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('researchData', JSON.stringify(data));
+    console.log('Calculator data captured:', fieldName, inputValue, result);
+  }
+
+  function captureSurveyData(questionId, response, questionText) {
+    let data = JSON.parse(localStorage.getItem('researchData')) || initializeDataCollection();
+    data.surveyData[questionId] = {
+      response: response,
+      questionText: questionText,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('researchData', JSON.stringify(data));
+    console.log('Survey data captured:', questionId, response);
+  }
+
+  function exportUnifiedData() {
+    const data = JSON.parse(localStorage.getItem('researchData'));
+    if (!data) {
+      alert('No data to export');
+      return;
+    }
+    
+    const csvContent = generateCSVFromUnifiedData(data);
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `research-data-${data.sessionId}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function generateCSVFromUnifiedData(data) {
+    const headers = ['SessionID', 'Timestamp', 'DataType', 'Field', 'Value', 'QuestionText', 'Result'];
+    const rows = [headers.join(',')];
+    
+    // Add calculator data rows
+    Object.entries(data.calculatorData || {}).forEach(([field, info]) => {
+      rows.push([
+        data.sessionId,
+        info.timestamp,
+        'Calculator',
+        field,
+        `"${info.input}"`,
+        '""',
+        `"${info.result || ''}"`
+      ].join(','));
+    });
+    
+    // Add survey data rows
+    Object.entries(data.surveyData || {}).forEach(([questionId, info]) => {
+      rows.push([
+        data.sessionId,
+        info.timestamp,
+        'Survey',
+        questionId,
+        `"${Array.isArray(info.response) ? info.response.join('; ') : info.response}"`,
+        `"${info.questionText || ''}"`,
+        '""'
+      ].join(','));
+    });
+    
+    return rows.join('\n');
+  }
+
   // Initialize Application
   function init() {
     console.log('Initializing BACC Calculator...');
+    
+    // Initialize data collection system
+    initializeDataCollection();
     
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
@@ -63,7 +159,7 @@
       setupApp();
     }
   }
-  
+
   function setupApp() {
     console.log('Setting up application...');
     
@@ -80,6 +176,7 @@
         loadExampleBtn: document.getElementById('loadExample'),
         resetFormBtn: document.getElementById('resetForm'),
         printResultsBtn: document.getElementById('printResults'),
+        exportDataBtn: document.getElementById('exportData'), // Add export button
         exampleModal: document.getElementById('exampleModal'),
         closeModalBtn: document.getElementById('closeModal')
       };
@@ -116,14 +213,15 @@
       console.error('Error during app setup:', error);
     }
   }
-  
+
   function setupEventListeners() {
     console.log('Setting up event listeners...');
     try {
-      // Form change listeners
+      // Form change listeners with data capture
       if (elements.rankSelect) {
         elements.rankSelect.addEventListener('change', function(event) {
           console.log('Rank changed to:', event.target.value);
+          captureCalculatorData('rank', event.target.value);
           updateCalculation();
         });
         console.log('Rank select listener added');
@@ -132,6 +230,7 @@
       if (elements.locationSelect) {
         elements.locationSelect.addEventListener('change', function(event) {
           console.log('Location changed to:', event.target.value);
+          captureCalculatorData('location', event.target.value);
           updateCalculation();
         });
         console.log('Location select listener added');
@@ -140,37 +239,12 @@
       if (elements.costShareInput) {
         elements.costShareInput.addEventListener('input', function(event) {
           console.log('Cost share changed to:', event.target.value);
+          captureCalculatorData('costShare', event.target.value);
           updateCalculation();
         });
         console.log('Cost share input listener added');
       }
-      // Initialize unified data structure 
-function initializeDataCollection() {
-    const sessionData = {
-        sessionId: generateSessionId(),
-        timestamp: new Date().toISOString(),
-        calculatorData: {},
-        surveyData: {},
-        metadata: { userAgent: navigator.userAgent }
-    };
-    localStorage.setItem('researchData', JSON.stringify(sessionData));
-    return sessionData;
-}
-      // ADD THIS NEW FUNCTION for survey data
-function captureSurveyData(questionId, response, questionText) {
-    let data = JSON.parse(localStorage.getItem('researchData')) || initializeDataCollection();
-    data.surveyData[questionId] = {
-        response: response,
-        questionText: questionText,
-        timestamp: new Date().toISOString()
-    };
-    localStorage.setItem('researchData', JSON.stringify(data));
-}
 
-// Generate unique session ID (NEW FUNCTION)  
-function generateSessionId() {
-    return 'calc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-}
       // Button listeners
       if (elements.addChildBtn) {
         elements.addChildBtn.addEventListener('click', function(event) {
@@ -211,6 +285,17 @@ function generateSessionId() {
         });
         console.log('Print results button listener added');
       }
+
+      // Export data button listener
+      if (elements.exportDataBtn) {
+        elements.exportDataBtn.addEventListener('click', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          console.log('Export data button clicked');
+          exportUnifiedData();
+        });
+        console.log('Export data button listener added');
+      }
       
       if (elements.closeModalBtn) {
         elements.closeModalBtn.addEventListener('click', function(event) {
@@ -242,7 +327,7 @@ function generateSessionId() {
       console.error('Error setting up event listeners:', error);
     }
   }
-  
+
   function setupScenarioCards() {
     try {
       const scenarioCards = document.querySelectorAll('.scenario-card');
@@ -270,6 +355,10 @@ function generateSessionId() {
       console.log('Adding child...');
       state.childrenCount++;
       const childId = `child-${state.childrenCount}`;
+      
+      // Capture child addition
+      captureCalculatorData('child_added', childId, state.childrenCount);
+      
       const childHTML = `
         <div class="child-card" id="${childId}">
           <div class="child-header">
@@ -309,6 +398,7 @@ function generateSessionId() {
       if (newAgeSelect) {
         newAgeSelect.addEventListener('change', function(event) {
           console.log('Child age changed to:', event.target.value);
+          captureCalculatorData(`${childId}_age`, event.target.value);
           updateCalculation();
         });
       }
@@ -330,10 +420,13 @@ function generateSessionId() {
       console.error('Error adding child:', error);
     }
   }
-  
+
   function removeChild(childId) {
     try {
       console.log('Removing child:', childId);
+      
+      // Capture child removal
+      captureCalculatorData('child_removed', childId);
       
       const childElement = document.getElementById(childId);
       if (childElement) {
@@ -355,7 +448,7 @@ function generateSessionId() {
       console.error('Error removing child:', error);
     }
   }
-  
+
   function updateChildrenArray() {
     try {
       state.children = [];
@@ -390,13 +483,13 @@ function generateSessionId() {
       return null;
     }
   }
-  
+
   // Calculations
   function calculateChildAllowance(rank, location, age, costShare) {
     // No longer used—calculation logic handled by backend API
     return { amount: 0, breakdown: null };
   }
-  
+
   async function updateCalculation() {
     try {
       console.log('Updating calculation...');
@@ -405,10 +498,21 @@ function generateSessionId() {
       const costShare = elements.costShareInput ? (parseFloat(elements.costShareInput.value) || 10) : 10;
       updateChildrenArray();
       
+      // Capture calculation request
+      captureCalculatorData('calculation_requested', {
+        rank,
+        location,
+        costShare,
+        childrenCount: state.children.length
+      });
+      
       // Fetch calculation from API
       const apiResult = await fetchBACCFromAPI(rank, location, costShare, state.children);
       
       if (apiResult && apiResult.perChild) {
+        // Capture calculation result
+        captureCalculatorData('calculation_result', apiResult.totalMonthly, apiResult);
+        
         apiResult.perChild.forEach((childResult, i) => {
           const child = state.children[i];
           const amountElement = document.getElementById(`${child.id}-amount`);
@@ -426,7 +530,7 @@ function generateSessionId() {
       console.error('Error updating calculation:', error);
     }
   }
-  
+
   function updateResultsSection(apiResult, rank, location, costShare, children) {
     try {
       if (!elements.calculationResults) {
@@ -465,7 +569,7 @@ function generateSessionId() {
       console.error('Error updating results section:', error);
     }
   }
-  
+
   function createChildCalculationHTML(childNumber, age, calculation) {
     const { amount, breakdown } = calculation;
     return `
@@ -499,7 +603,7 @@ function generateSessionId() {
       </div>
     `;
   }
-  
+
   // Modal functions
   function showExampleModal() {
     try {
@@ -519,7 +623,7 @@ function generateSessionId() {
       console.error('Error showing example modal:', error);
     }
   }
-  
+
   function hideExampleModal() {
     try {
       console.log('Hiding example modal');
@@ -532,7 +636,7 @@ function generateSessionId() {
       console.error('Error hiding example modal:', error);
     }
   }
-  
+
   function loadExampleScenario(index) {
     try {
       console.log('Loading example scenario:', index);
@@ -550,11 +654,13 @@ function generateSessionId() {
       // Set rank and location
       if (elements.rankSelect) {
         elements.rankSelect.value = scenario.rank;
+        captureCalculatorData('example_scenario_rank', scenario.rank);
         console.log('Set rank to:', scenario.rank);
       }
       
       if (elements.locationSelect) {
         elements.locationSelect.value = scenario.location;
+        captureCalculatorData('example_scenario_location', scenario.location);
         console.log('Set location to:', scenario.location);
       }
       
@@ -570,6 +676,7 @@ function generateSessionId() {
             const ageSelect = lastChild.querySelector('.child-age');
             if (ageSelect) {
               ageSelect.value = childData.age;
+              captureCalculatorData(`example_scenario_child_${childIndex}_age`, childData.age);
               console.log('Set child age to:', childData.age);
             }
           }
@@ -593,10 +700,13 @@ function generateSessionId() {
       console.error('Error loading example scenario:', error);
     }
   }
-  
+
   function resetForm() {
     try {
       console.log('Resetting form');
+      
+      // Capture form reset
+      captureCalculatorData('form_reset', new Date().toISOString());
       
       // Reset form fields
       if (elements.rankSelect) elements.rankSelect.value = '';
@@ -719,7 +829,6 @@ function generateSessionId() {
         ],
         required: true
       },
-
       {
         id: 'spouseImpact',
         type: 'radio',
@@ -808,15 +917,12 @@ function generateSessionId() {
       if (startButton) {
         startButton.addEventListener('click', () => this.startSurvey());
       }
-
       if (nextButton) {
         nextButton.addEventListener('click', () => this.nextPage());
       }
-
       if (backButton) {
         backButton.addEventListener('click', () => this.previousPage());
       }
-
       if (skipButton) {
         skipButton.addEventListener('click', () => this.skipSurvey());
       }
@@ -876,7 +982,6 @@ function generateSessionId() {
       const question = availableQuestions[this.currentPage];
       
       if (!question) return;
-
       this.updateProgress();
       this.renderQuestion(question);
       this.updateButtons();
@@ -986,7 +1091,7 @@ function generateSessionId() {
 
       html += `</div>`;
       content.innerHTML = html;
-
+      
       // Add event listeners for form elements
       this.bindQuestionEvents(question);
     },
@@ -1005,6 +1110,8 @@ function generateSessionId() {
       if (question.type === 'radio') {
         if (input.checked) {
           this.responses[question.id] = input.value;
+          // Capture survey response to unified data system
+          captureSurveyData(question.id, input.value, question.title);
         }
       } else if (question.type === 'checkbox') {
         if (!this.responses[question.id]) {
@@ -1016,15 +1123,20 @@ function generateSessionId() {
         } else if (!input.checked) {
           this.responses[question.id] = this.responses[question.id].filter(v => v !== input.value);
         }
+        
+        // Capture survey response to unified data system
+        captureSurveyData(question.id, this.responses[question.id], question.title);
       }
       
       // Save follow-up responses
       if (input.name.includes('_followup')) {
         this.responses[input.name] = input.value;
+        captureSurveyData(input.name, input.value, question.title + ' - Follow-up');
       }
       
       if (input.name.includes('_other')) {
         this.responses[input.name] = input.value;
+        captureSurveyData(input.name, input.value, question.title + ' - Other');
       }
     },
 
@@ -1081,6 +1193,9 @@ function generateSessionId() {
 
     async submitSurvey() {
       try {
+        // Also capture survey completion to unified data system
+        captureSurveyData('survey_completed', 'true', 'Survey Completion Status');
+        
         const response = await fetch('http://localhost:5050/api/submit-survey', {
           method: 'POST',
           headers: {
@@ -1104,9 +1219,8 @@ function generateSessionId() {
       this.closeSurvey();
     }
   };
-  
+
   // Start the application
   console.log('Starting BACC Calculator application');
   init();
 })();
-
