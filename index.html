@@ -81,15 +81,25 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="location" class="form-label">Geographic Cost Area *</label>
-                        <select id="location" class="form-control" required>
-                            <option value="">Select Location</option>
-                            <option value="Low Cost">Low Cost Area (0.8x multiplier)</option>
-                            <option value="Standard Cost">Standard Cost Area (1.0x multiplier)</option>
-                            <option value="High Cost">High Cost Area (1.5x multiplier)</option>
-                        </select>
-                    </div>
+                   <div class="form-group">
+  <label for="location" class="form-label">Geographic Cost Area *</label>
+  <select id="location" class="form-control" required>
+    <option value="">Select Cost Area</option>
+    <option value="Low Cost">Low Cost</option>
+    <option value="Standard Cost">Standard Cost</option>
+    <option value="High Cost">High Cost</option>
+    <option value="">Don't know your cost area?</option>
+  </select>
+  <div class="cost-area-help">
+    <p class="help-text">
+      <strong>Don't know your installation's cost area?</strong> 
+      <a href="https://www.occproject.org/calculators#:~:text=High%20Cost%20Installations%20for%20Military%20Fee%20Assistance" target="_blank" rel="noopener">
+        Click here to check your installation's cost area →
+      </a>
+    </p>
+  </div>
+</div>
+
 
                     <div class="form-group">
                         <label for="costShare" class="form-label">
