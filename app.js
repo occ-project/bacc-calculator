@@ -176,7 +176,7 @@
         loadExampleBtn: document.getElementById('loadExample'),
         resetFormBtn: document.getElementById('resetForm'),
         printResultsBtn: document.getElementById('printResults'),
-        exportDataBtn: document.getElementById('exportData'), // Add export button
+        exportDataBtn: document.getElementById('exportData'),
         exampleModal: document.getElementById('exampleModal'),
         closeModalBtn: document.getElementById('closeModal')
       };
